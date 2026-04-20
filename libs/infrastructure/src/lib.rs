@@ -1,5 +1,7 @@
-use sqlx::postgres::{PgPoolOptions, PgPool};
+use sqlx::postgres::{PgPool, PgPoolOptions};
 use std::time::Duration;
+
+mod repositories;
 
 pub async fn init_db_pool(database_url: &str) -> anyhow::Result<PgPool> {
     let pool = PgPoolOptions::new()
@@ -7,6 +9,6 @@ pub async fn init_db_pool(database_url: &str) -> anyhow::Result<PgPool> {
         .acquire_timeout(Duration::from_secs(3))
         .connect(database_url)
         .await?;
-    
+
     Ok(pool)
 }
