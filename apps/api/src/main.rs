@@ -1,9 +1,22 @@
+use axum::{extract::FromRef, Router};
 use dotenvy::dotenv;
 use infrastructure::init_db_pool;
+use sqlx::PgPool;
 use std::env;
 
 mod handlers;
 mod routes;
+
+#[derive(Clone, FromRef)]
+struct AppState {
+    db: PgPool,
+}
+
+// impl FromRef<AppState> for Pool<Postgres> {
+//     fn from_ref(state: &AppState) -> Self {
+//         state.db.clone()
+//     }
+// }
 
 #[tokio::main]
 async fn main() {
@@ -18,12 +31,11 @@ async fn main() {
         .await
         .expect("Failed to connect to DB");
 
-    // 3. Build route
-    // let app = Router::new()
-    //     .route("/", get(|| async { "Hệ thống quản lý kho hóa chất sẵn sàng!" }))
-    //     .with_state(pool); // Chia sẻ pool cho các handler
+    let shared_state = AppState { db: pool };
 
-    let app = routes::create_router(pool);
+    let app = Router::new()
+        .nest("/api/v1", routes::create_router())
+        .with_state(shared_state);
 
     // 4. Chạy server
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();

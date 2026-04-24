@@ -1,9 +1,11 @@
-use axum::{routing::post, Router};
-use sqlx::PgPool;
+use std::sync::Arc;
 
-use crate::handlers; // Gọi thông qua module handlers đã khai báo
-pub fn create_router(pool: PgPool) -> Router {
-    Router::new()
-        .route("/login", post(handlers::auth_handler::login))
-        .with_state(pool)
+use axum::Router;
+
+use crate::AppState;
+
+mod auth_route;
+
+pub fn create_router() -> Router<AppState> {
+    Router::new().nest("/auth", auth_route::create_auth_route())
 }

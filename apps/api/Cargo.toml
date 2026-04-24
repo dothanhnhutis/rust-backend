@@ -21,3 +21,4 @@ dotenvy = "0.15"
 tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tower-http = { version = "0.6.8", features = ["cors", "trace"] }
+async-trait = "0.1.89"
